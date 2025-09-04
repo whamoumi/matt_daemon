@@ -1,0 +1,37 @@
+#include <iostream>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <string.h>
+#include "Tintin_reporter.hpp"
+#include <fcntl.h>     // O_RDWR, O_CREAT
+#include <sys/file.h>  // flock(), LOCK_EX, LOCK_UN
+#include <sys/stat.h>  // mode_t (0666)
+#include <cstdlib>     // exit()
+
+class MattDaemon {
+    public:
+        // Socket file descriptor
+        MattDaemon();
+        ~MattDaemon();
+
+        Tintin_reporter reporter;
+        unsigned int number_of_users; // Number of users connected to the daemon
+        unsigned int max_number_of_users; // Maximum number of users allowed to connect
+
+        void start();
+        bool isLocked() const { return lock; }
+        void setLock(bool l) { lock = l; }
+        void setfd_flock(int fd) { fd_flock = fd; }
+        int getFdFlock() const { return fd_flock; }
+        int getServerSocket() const { return server_socket; }
+        bool handleClient(int client_socket);
+        void stop();
+    private:
+        bool lock;
+        int server_socket;
+        int fd_flock;
+        struct sockaddr_in address;
+        int port;
+};
