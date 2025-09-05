@@ -1,6 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
 
 class Tintin_reporter {
     public:
@@ -13,4 +16,5 @@ class Tintin_reporter {
         std::string reporter_path;
         std::string reporter_lock;
         std::ofstream lock_file;
+        std::string getCurrentTimestamp();
 };

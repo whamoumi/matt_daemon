@@ -1,36 +1,20 @@
-# Variables
-NAME = MattDaemon
-CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
-SRCDIR = .
-OBJDIR = obj
+CXXFLAGS	=	-Wall -Wextra -Werror -std=c++17 
+NAME		=	MattDaemon
+SRC		=	$(wildcard ./*.cpp)
 
-# Source files
-SOURCES = main.cpp Matt_daemon.cpp Tintin_reporter.cpp
-OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+OBJ		=	$(SRC:.cpp=.o)
 
-# Default target
 all: $(NAME)
 
-# Create executable
-$(NAME): $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(NAME)
+$(NAME): $(OBJ)
+	$(CXX) $(OBJ) -o $(NAME)
 
-# Compile object files
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	@mkdir -p $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Clean object files
 clean:
-	rm -rf $(OBJDIR)
+	$(RM) $(OBJ)
 
-# Clean everything
 fclean: clean
-	rm -f $(NAME)
+	$(RM) $(NAME)
 
-# Rebuild everything
 re: fclean all
 
-# Phony targets
 .PHONY: all clean fclean re

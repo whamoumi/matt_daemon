@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <sys/stat.h>
 #include <signal.h>
+#include <unistd.h>
 
 
 int running = 1;
@@ -71,6 +72,7 @@ void mainn() {
                     client_sockets.push_back(client_socket);
                     daemon.number_of_users++;
                 } else {
+                    send(client_socket, "Server full. Try again later.\n", 30, 0);
                     close(client_socket);
                 }
             }
@@ -99,6 +101,12 @@ void mainn() {
 }
 
 int main() {
+    if (getuid() != 0) {
+        std::cerr << "Error: Matt_daemon must be run as root." << std::endl;
+        std::cerr << "Usage: sudo ./MattDaemon" << std::endl;
+        return 1;
+    }
+
     pid_t pid;
 
     int fd = open("/var/lock/matt_daemon.lock", O_RDWR, 0666);
@@ -120,7 +128,6 @@ int main() {
         }
     }
  
-    // Fork
     pid = fork();
     if (pid < 0) exit(EXIT_FAILURE);
     if (pid > 0) exit(EXIT_SUCCESS);
@@ -133,7 +140,9 @@ int main() {
     signal(SIGQUIT, handle_signal);
     signal(SIGKILL, handle_signal);
 
-    chdir("/");
+    if (chdir("/") < 0) {
+        exit(EXIT_FAILURE);
+    }
     umask(0);
 
     close(STDIN_FILENO);
