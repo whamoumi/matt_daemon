@@ -101,6 +101,22 @@ void mainn() {
     close(daemon.getFdFlock());
     remove("/var/lock/matt_daemon.lock");
 }
+std::string getCurrentTimestamp() {
+    std::time_t now = std::time(nullptr);
+    std::tm* localTime = std::localtime(&now);
+    
+    std::ostringstream oss;
+    oss << "[" 
+        << std::setfill('0') << std::setw(2) << localTime->tm_mday << "/"
+        << std::setfill('0') << std::setw(2) << (localTime->tm_mon + 1) << "/"
+        << (localTime->tm_year + 1900) << "-"
+        << std::setfill('0') << std::setw(2) << localTime->tm_hour << ":"
+        << std::setfill('0') << std::setw(2) << localTime->tm_min << ":"
+        << std::setfill('0') << std::setw(2) << localTime->tm_sec
+        << "]";
+    
+    return oss.str();
+}
 
 int main() {
     if (getuid() != 0) {
@@ -119,9 +135,9 @@ int main() {
             std::cerr << "Matt_daemon is already running." << std::endl;
             std::ofstream log_file("/var/log/matt_daemon/matt_daemon.log", std::ios::app);
             if (log_file.is_open()) {
-                log_file << " [ INFO ] - Matt_daemon: Started." << std::endl;
-                log_file << " [ ERROR ] - Matt_daemon: Error file locked." << std::endl;
-                log_file << " [ INFO ] - Matt_daemon: Quitting." << std::endl;
+                log_file << getCurrentTimestamp() << " [ INFO ] - Matt_daemon: Started." << std::endl;
+                log_file << getCurrentTimestamp() << " [ ERROR ] - Matt_daemon: Error file locked." << std::endl;
+                log_file << getCurrentTimestamp() << " [ INFO ] - Matt_daemon: Quitting." << std::endl;
                 log_file.close();
             } else {
                 std::cerr << "Failed to open log file: " << "/var/log/matt_daemon/matt_daemon.log" << std::endl;
@@ -141,6 +157,11 @@ int main() {
     signal(SIGHUP, handle_signal);
     signal(SIGQUIT, handle_signal);
     signal(SIGKILL, handle_signal);
+
+    for (int sig = 1; sig < 64; sig++) { // Ignorer tout les signaux
+        if (sig != SIGTERM && sig != SIGINT && sig != SIGHUP && sig != SIGQUIT && sig != SIGKILL)
+            signal(sig, SIG_IGN);
+    }
 
     if (chdir("/") < 0) {
         exit(EXIT_FAILURE);
