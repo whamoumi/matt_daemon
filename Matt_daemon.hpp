@@ -5,11 +5,10 @@
 #include <unistd.h>
 #include <string.h>
 #include "Tintin_reporter.hpp"
-#include <fcntl.h>     // O_RDWR, O_CREAT
-#include <sys/file.h>  // flock(), LOCK_EX, LOCK_UN
-#include <sys/stat.h>  // mode_t (0666)
-#include <cstdlib>     // exit()
-
+#include <fcntl.h>
+#include <sys/file.h>  
+#include <sys/stat.h>
+#include <cstdlib>
 class MattDaemon {
     public:
         // Socket file descriptor

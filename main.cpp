@@ -95,6 +95,8 @@ void mainn() {
             i++;
         }
     }
+    daemon.reporter.report("- Matt_daemon: Signal handler", "INFO");
+    daemon.reporter.report("- Matt_daemon: Quitting", "INFO");
     flock(daemon.getFdFlock(), LOCK_UN);
     close(daemon.getFdFlock());
     remove("/var/lock/matt_daemon.lock");

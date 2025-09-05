@@ -6,7 +6,6 @@ Tintin_reporter::Tintin_reporter() {
 }
 
 Tintin_reporter::~Tintin_reporter() {
-    remove(reporter_path.c_str());
 }
 
 std::string Tintin_reporter::getCurrentTimestamp() {
