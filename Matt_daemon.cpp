@@ -2,6 +2,7 @@
 #include <iostream>
 #include <signal.h>
 
+// Constructeur par défaut
 MattDaemon::MattDaemon() {
     number_of_users = 0;
     server_socket = -1;
@@ -17,7 +18,67 @@ MattDaemon::MattDaemon() {
     }
 }
 
+// Constructeur de copie
+MattDaemon::MattDaemon(const MattDaemon& other) 
+    : reporter(other.reporter),
+      number_of_users(0), // Reset pour éviter les conflits
+      max_number_of_users(other.max_number_of_users),
+      lock(false), // Reset pour éviter les conflits
+      server_socket(-1), // Nouveau socket nécessaire
+      fd_flock(-1), // Nouveau fd nécessaire
+      port(other.port) {
+    
+    // Créer un nouveau socket pour cette instance
+    server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket < 0) {
+        std::cerr << "Erreur création socket dans constructeur de copie" << std::endl;
+    }
+    
+    // Copier l'adresse
+    address = other.address;
+}
+
+// Opérateur d'assignation
+MattDaemon& MattDaemon::operator=(const MattDaemon& other) {
+    if (this != &other) {
+        // Nettoyer les ressources existantes
+        if (server_socket >= 0) {
+            close(server_socket);
+        }
+        if (fd_flock >= 0) {
+            close(fd_flock);
+        }
+        
+        // Copier les données
+        reporter = other.reporter;
+        number_of_users = 0; // Reset pour éviter les conflits
+        max_number_of_users = other.max_number_of_users;
+        lock = false; // Reset pour éviter les conflits
+        port = other.port;
+        address = other.address;
+        
+        // Créer un nouveau socket
+        server_socket = socket(AF_INET, SOCK_STREAM, 0);
+        if (server_socket < 0) {
+            std::cerr << "Erreur création socket dans opérateur d'assignation" << std::endl;
+        }
+        fd_flock = -1; // Nouveau fd nécessaire
+    }
+    return *this;
+}
+
+// Destructeur
 MattDaemon::~MattDaemon() {
+    // Nettoyer les ressources
+    if (server_socket >= 0) {
+        close(server_socket);
+        server_socket = -1;
+    }
+    if (fd_flock >= 0) {
+        flock(fd_flock, LOCK_UN);
+        close(fd_flock);
+        fd_flock = -1;
+    }
 }
 
 void MattDaemon::start() {    

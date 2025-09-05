@@ -7,8 +7,11 @@
 
 class Tintin_reporter {
     public:
-        Tintin_reporter();
-        ~Tintin_reporter();
+        // Forme canonique de Coplien
+        Tintin_reporter();                                        // Constructeur par défaut
+        Tintin_reporter(const Tintin_reporter& other);           // Constructeur de copie
+        Tintin_reporter& operator=(const Tintin_reporter& other); // Opérateur d'assignation
+        ~Tintin_reporter();                                       // Destructeur
 
         void report(const std::string& message, const std::string& level);
 

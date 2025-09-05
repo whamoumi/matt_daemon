@@ -1,11 +1,42 @@
 #include "Tintin_reporter.hpp"
 
+// Constructeur par défaut
 Tintin_reporter::Tintin_reporter() {
     reporter_path = "/var/log/matt_daemon/matt_daemon.log";
-
+    reporter_lock = "";
 }
 
+// Constructeur de copie
+Tintin_reporter::Tintin_reporter(const Tintin_reporter& other) 
+    : reporter_path(other.reporter_path),
+      reporter_lock(other.reporter_lock) {
+    // Note: lock_file ne peut pas être copié car c'est un ofstream
+    // Il sera initialisé si nécessaire lors de l'utilisation
+}
+
+// Opérateur d'assignation
+Tintin_reporter& Tintin_reporter::operator=(const Tintin_reporter& other) {
+    if (this != &other) {
+        // Fermer le fichier existant s'il est ouvert
+        if (lock_file.is_open()) {
+            lock_file.close();
+        }
+        
+        // Copier les données
+        reporter_path = other.reporter_path;
+        reporter_lock = other.reporter_lock;
+        
+        // Note: lock_file sera réinitialisé si nécessaire lors de l'utilisation
+    }
+    return *this;
+}
+
+// Destructeur
 Tintin_reporter::~Tintin_reporter() {
+    // Fermer le fichier s'il est ouvert
+    if (lock_file.is_open()) {
+        lock_file.close();
+    }
 }
 
 std::string Tintin_reporter::getCurrentTimestamp() {

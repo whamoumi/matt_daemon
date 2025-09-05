@@ -11,14 +11,15 @@
 #include <cstdlib>
 class MattDaemon {
     public:
-        // Socket file descriptor
-        MattDaemon();
-        ~MattDaemon();
+        // Forme canonique de Coplien
+        MattDaemon();                                   // Constructeur par défaut
+        MattDaemon(const MattDaemon& other);           // Constructeur de copie
+        MattDaemon& operator=(const MattDaemon& other); // Opérateur d'assignation
+        ~MattDaemon();                                  // Destructeur
 
         Tintin_reporter reporter;
-        unsigned int number_of_users; // Number of users connected to the daemon
-        unsigned int max_number_of_users; // Maximum number of users allowed to connect
-
+        unsigned int number_of_users;
+        unsigned int max_number_of_users;
         void start();
         bool isLocked() const { return lock; }
         void setLock(bool l) { lock = l; }
