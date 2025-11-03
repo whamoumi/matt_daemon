@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 
-int running = 1;
+int running = 5;
 
 void handle_signal(int signal) {
     std::cout << "Received signal: " << signal << std::endl;
